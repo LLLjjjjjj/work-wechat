@@ -1,6 +1,7 @@
 .idea/
 .vscode/
 bin/
+.git/
 */.DS_Store
 go.sum
 *.log
