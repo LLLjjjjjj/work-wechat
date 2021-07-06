@@ -12,7 +12,7 @@ type respCommon struct {
 
 /**
 获取服务商凭证校验
- */
+*/
 // reqGetProviderToken 获取服务商凭证校验
 type reqGetProviderToken struct {
 	CorpId         string `json:"corpid"`
@@ -41,7 +41,6 @@ type ProviderToken struct {
 	ProviderAccessToken string `json:"provider_access_token"`
 	ExpiresIn           int    `json:"expires_in"`
 }
-
 
 /**
 获取第三方应用凭证校验
@@ -78,7 +77,7 @@ type SuiteToken struct {
 
 /**
 获取企业凭证校验
- */
+*/
 // reqGetCorpToken 获取企业凭证校验
 type reqGetCorpToken struct {
 	AuthCorpID    string `json:"auth_corpid"`
@@ -108,10 +107,9 @@ type CorpToken struct {
 	ExpiresIn   int    `json:"expires_in"`
 }
 
-
 /**
 获取企业授权码
- */
+*/
 // reqGetPreAuthCode 获取预授权码校验
 type reqGetPreAuthCode struct {
 	SuiteAccessToken string `json:"suite_access_token"`
@@ -139,7 +137,7 @@ type PreAuthCode struct {
 
 /**
 永久授权码
- */
+*/
 // reqGetPermanentCode 获取永久授权码校验
 type reqGetPermanentCode struct {
 	AuthCode string `json:"auth_code"`
