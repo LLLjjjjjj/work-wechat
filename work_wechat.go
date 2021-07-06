@@ -1,6 +1,10 @@
 package work
 
-import "context"
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+)
 
 type Options func(w *workWechat) *workWechat
 
@@ -75,3 +79,21 @@ func (w workWechat) Do(ctx context.Context, weWorkAction Action) ([]byte, error)
 	//todo  context包超时 释放原则
 	return weWorkAction.DoRequest()
 }
+
+//scan 方法 绑定到指定的结构体
+func (w workWechat) Scan(ctx context.Context, weWorkAction Action, pointer interface{}) error {
+	//todo  context包超时 释放原则
+	requestRes , err := weWorkAction.DoRequest()
+	if err != nil{
+		return err
+	}
+
+	err = json.Unmarshal(requestRes, &pointer)
+	fmt.Println(string(requestRes))
+
+	if err != nil{
+		return err
+	}
+	return nil
+}
+

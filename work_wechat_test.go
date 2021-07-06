@@ -31,14 +31,16 @@ func TestNewWorkWechat(t *testing.T) {
 	// TODO 获取 suitAccessToken
 	suitAccessToken := "suitAccessToken"
 	// 获取 企业预先授权码
-	res, err := classInfo.Do(context.Background(), NewGetPreAuthCode(suitAccessToken))
-	fmt.Println(string(res))
+	opt := &respGetPreAuthCode{}
+	err := classInfo.Scan(context.Background(), NewGetPreAuthCode(suitAccessToken), opt)
+	fmt.Println(opt)
+	t.Log(err)
 	// 获取 企业的永久授权码
 	authCode := "1111"
-	res, err = classInfo.Do(context.Background(), NewGetPermanentCode(suitAccessToken, authCode))
-	fmt.Println(err)
-	fmt.Println(res)
-
-	fmt.Println(classInfo)
+	req :=  reqGetPermanentCode{
+		AuthCode: authCode,
+	}
+	err = classInfo.Scan(context.Background(), NewGetPermanentCode(suitAccessToken, authCode),req )
+	t.Log(err)
 
 }
