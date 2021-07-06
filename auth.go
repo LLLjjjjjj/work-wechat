@@ -1,12 +1,15 @@
 package work
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/gogf/gf/util/gconv"
 )
 
 type auth struct {
-	workWechat workWechat
+	workWechat      workWechat
+	SuitAccessToken string
 }
 
 func (w workWechat) NewAuth() *auth {
@@ -16,7 +19,7 @@ func (w workWechat) NewAuth() *auth {
 }
 
 // GetPreAuthCode 获取预授权码 https://work.weixin.qq.com/api/doc/90001/90143/90601
-func (a *auth) GetPreAuthCode () (respGetPreAuthCode, error) {
+func (a *auth) GetPreAuthCode() (respGetPreAuthCode, error) {
 
 	suitAccessToken := a.workWechat.NewAccessToken().getSuitAccessToken()
 
@@ -41,7 +44,7 @@ func (a *auth) GetPreAuthCode () (respGetPreAuthCode, error) {
 }
 
 // GetPermanentCode 获取企业永久授权码 https://work.weixin.qq.com/api/doc/90001/90143/90603
-func (a *auth) GetPermanentCode (authCode string) (respGetPermanentCode, error) {
+func (a *auth) GetPermanentCode(authCode string) (respGetPermanentCode, error) {
 
 	suitAccessToken := a.workWechat.NewAccessToken().getSuitAccessToken()
 
@@ -50,7 +53,7 @@ func (a *auth) GetPermanentCode (authCode string) (respGetPermanentCode, error) 
 	}
 	var respGetPermanentCode = respGetPermanentCode{}
 
-	resp, err := HttpClient.httpPost("/cgi-bin/service/get_permanent_code?" + suitAccessToken, req)
+	resp, err := HttpClient.httpPost("/cgi-bin/service/get_permanent_code?"+suitAccessToken, req)
 	if err != nil {
 		return respGetPermanentCode, err
 	}
@@ -63,4 +66,30 @@ func (a *auth) GetPermanentCode (authCode string) (respGetPermanentCode, error) 
 	}
 
 	return respGetPermanentCode, nil
+}
+
+// GetPreAuthCode 获取预授权码 https://work.weixin.qq.com/api/doc/90001/90143/90601
+func NewGetPreAuthCode(suitAccessToken string) Action {
+	reqUrl := BaseWeWorkUrl + fmt.Sprintf("/cgi-bin/service/get_pre_auth_code?%s", suitAccessToken)
+	return NewWeWordApi(reqUrl,
+		WitchMethod(HttpGet),
+	)
+}
+
+// GetPermanentCode 获取企业永久授权码 https://work.weixin.qq.com/api/doc/90001/90143/90603
+func NewGetPermanentCode(suitAccessToken string, authCode string) Action {
+	reqUrl := BaseWeWorkUrl + fmt.Sprintf("/cgi-bin/service/get_permanent_code?%s", suitAccessToken)
+	return NewWeWordApi(reqUrl,
+		WitchMethod(HttpPost),
+		WitchBody(func() (bytes []byte, e error) {
+			reqInfo := reqGetPermanentCode{
+				AuthCode: authCode,
+			}
+			jsonInfo, err := json.Marshal(reqInfo)
+			if err != nil {
+				return nil, err
+			}
+			return jsonInfo, nil
+		}),
+	)
 }

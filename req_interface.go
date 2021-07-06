@@ -11,4 +11,3 @@ type urlValuer interface {
 type bodyer interface {
 	intoBody() ([]byte, error)
 }
-

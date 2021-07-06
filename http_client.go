@@ -84,4 +84,3 @@ func (h httpClient) composeQyapiURL(path string, req interface{}) *url.URL {
 
 	return base
 }
-

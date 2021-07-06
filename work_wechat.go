@@ -1,7 +1,12 @@
 package work
 
-type Options func(w *workWechat) *workWechat
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+)
 
+type Options func(w *workWechat) *workWechat
 
 type workWechat struct {
 	// 服务商的corpid
@@ -26,7 +31,6 @@ type workWechat struct {
 	PermanentCode string
 }
 
-
 var defaultWorkWechat = workWechat{
 	ProviderCorpID: "",
 	ProviderSecret: "",
@@ -45,18 +49,18 @@ func SetProviderCorpID(ProviderCorpID string) Options {
 }
 
 // todo
-func SetProviderSecret()  {
-	
+func SetProviderSecret() {
+
 }
 
-func NewWeWork(opts ...Options)  *workWechat  {
-	defaultWorkInfo :=  defaultWorkWechat
+// todo 选项设计模式
+func NewWeWork(opts ...Options) *workWechat {
+	defaultWorkInfo := defaultWorkWechat
 	for _, v := range opts {
 		v(&defaultWorkInfo)
 	}
 	return &defaultWorkInfo
 }
-
 
 func NewWorkWechat(config Config) *workWechat {
 	return &workWechat{
@@ -70,4 +74,26 @@ func NewWorkWechat(config Config) *workWechat {
 	}
 }
 
+// 返回原包数据  直接进行链式炒作
+func (w workWechat) Do(ctx context.Context, weWorkAction Action) ([]byte, error) {
+	//todo  context包超时 释放原则
+	return weWorkAction.DoRequest()
+}
+
+//scan 方法 绑定到指定的结构体
+func (w workWechat) Scan(ctx context.Context, weWorkAction Action, pointer interface{}) error {
+	//todo  context包超时 释放原则
+	requestRes , err := weWorkAction.DoRequest()
+	if err != nil{
+		return err
+	}
+
+	err = json.Unmarshal(requestRes, &pointer)
+	fmt.Println(string(requestRes))
+
+	if err != nil{
+		return err
+	}
+	return nil
+}
 
