@@ -1,4 +1,4 @@
-module LLLjjjjjj/work-wechat
+module github.com/LLLjjjjjj/work-wechat
 
 go 1.15
 
