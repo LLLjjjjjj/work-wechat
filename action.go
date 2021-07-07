@@ -6,7 +6,10 @@
 */
 package work
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 type Action interface {
 	// 获取 设置请求url
@@ -16,7 +19,7 @@ type Action interface {
 	GetRequestBody() ([]byte, error)
 
 	// 真正的发出请求
-	DoRequest() ([]byte, error)
+	DoRequest(ctx context.Context) ([]byte, error)
 
 	// 获取httpMethod
 	GetHttpMethod() HTTPMethod
