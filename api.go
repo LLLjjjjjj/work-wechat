@@ -7,6 +7,7 @@
 package work
 
 import (
+	"context"
 	"errors"
 	"github.com/gogf/gf/frame/g"
 	"net/http"
@@ -58,7 +59,7 @@ func (w weWorkApi) GetTimeOut() time.Duration {
 	return w.timeout
 }
 
-func (w weWorkApi) DoRequest() ([]byte, error) {
+func (w weWorkApi) DoRequest(ctx context.Context) ([]byte, error) {
 	requestUrl := w.GetRequestUrl()
 	if len(requestUrl) < 1 {
 		return nil, errors.New("设置http请求有误，请设置httpUrl后重试")
@@ -70,6 +71,8 @@ func (w weWorkApi) DoRequest() ([]byte, error) {
 		return nil, errors.New("设置httpMethod请求有误，设置httpMethod请求有误后重试")
 	}
 	httpClient := g.Client()
+	// 超时包
+	httpClient.SetCtx(ctx)
 	// 超时时间
 	timeOut := w.GetTimeOut()
 	httpClient.SetTimeout(timeOut)

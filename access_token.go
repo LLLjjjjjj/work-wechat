@@ -2,7 +2,9 @@ package work
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/arden/easy"
 	"github.com/arden/easy/database/redis"
 	"github.com/gogf/gf/util/gconv"
@@ -124,3 +126,60 @@ func (a *accessToken) corpAccessToken() (reqGetCorpToken, error) {
 
 	return reqGetCorpToken, nil
 }
+
+func GetProviderAccessTokenAction(providerCorpId string, providerSecret string) Action {
+	reqUrl := BaseWeWorkUrl + "/cgi-bin/service/get_provider_token"
+	return NewWeWordApi(reqUrl,
+		WitchMethod(HttpPost),
+		WitchBody(func() (bytes []byte, e error) {
+			var req = reqGetProviderToken{
+				CorpId:         providerCorpId,
+				ProviderSecret: providerSecret,
+			}
+			jsonInfo , err := json.Marshal(req)
+			if err != nil{
+				return nil, err
+			}
+			return jsonInfo, nil
+		}),
+	)
+}
+
+func GetSuitAccessTokenAction(suiteId string ,suiteSecret string, suiteTicket string) Action {
+	reqUrl := BaseWeWorkUrl + "/cgi-bin/service/get_suite_token"
+	return NewWeWordApi(reqUrl,
+		WitchMethod(HttpPost),
+		WitchBody(func() (bytes []byte, e error) {
+			var req = reqGetSuiteToken{
+				SuiteID:     suiteId,
+				SuitSecret:  suiteSecret,
+				SuiteTicket: suiteTicket,
+			}
+			jsonInfo , err := json.Marshal(req)
+			if err != nil{
+				return nil, err
+			}
+			return jsonInfo, nil
+		}),
+	)
+}
+
+func GetCorpAccessTokenAction(suitAccessToken string, corpId string, permanentCode string) Action {
+	reqUrl := BaseWeWorkUrl + fmt.Sprintf("/cgi-bin/service/get_suite_token?suite_access_token=%s", suitAccessToken)
+	return NewWeWordApi(reqUrl,
+		WitchMethod(HttpPost),
+		WitchBody(func() (bytes []byte, e error) {
+			var req = reqGetCorpToken{
+				AuthCorpID:    corpId,
+				PermanentCode: permanentCode,
+			}
+			jsonInfo , err := json.Marshal(req)
+			if err != nil{
+				return nil, err
+			}
+			return jsonInfo, nil
+		}),
+	)
+}
+
+

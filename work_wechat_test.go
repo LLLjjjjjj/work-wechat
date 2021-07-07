@@ -44,3 +44,68 @@ func TestNewWorkWechat(t *testing.T) {
 	t.Log(err)
 
 }
+
+func TestGetProviderAccessTokenAction(t *testing.T) {
+	//GetProviderAccessTokenAction
+	testConfig := Config{
+		ProviderCorpID: "",
+		ProviderSecret: "",
+		SuiteID:        "",
+		SuiteSecret:    "",
+		SuiteTicket:    "",
+		CorpId:         "",
+		PermanentCode:  "",
+	}
+	classInfo := NewWorkWechat(testConfig)
+	var respGetProviderToken = respGetProviderToken{}
+	err := classInfo.Scan(context.Background(),
+		GetProviderAccessTokenAction(testConfig.ProviderCorpID,testConfig.ProviderSecret),
+		respGetProviderToken,
+	)
+	fmt.Println(err)
+}
+
+func TestGetSuitAccessTokenAction(t *testing.T) {
+	testConfig := Config{
+		ProviderCorpID: "",
+		ProviderSecret: "",
+		SuiteID:        "",
+		SuiteSecret:    "",
+		SuiteTicket:    "",
+		CorpId:         "",
+		PermanentCode:  "",
+	}
+	classInfo := NewWorkWechat(testConfig)
+	var resp = reqGetSuiteToken{}
+	err := classInfo.Scan(context.Background(),
+		GetSuitAccessTokenAction(testConfig.SuiteID,testConfig.SuiteSecret, testConfig.SuiteTicket),
+		resp,
+	)
+	fmt.Println(err)
+	fmt.Println(resp)
+}
+
+func TestGetCorpAccessTokenAction(t *testing.T) {
+	weworkChatConfig := Config{
+		ProviderCorpID: "",
+		ProviderSecret: "",
+		SuiteID:        "",
+		SuiteSecret:    "",
+		SuiteTicket:    "",
+		CorpId:         "",
+		PermanentCode:  "",
+	}
+	var req = reqGetCorpToken{}
+	suitAccessToken := "1111"
+
+
+	classInfo := NewWorkWechat(weworkChatConfig)
+	err := classInfo.Scan(context.Background(),
+		GetCorpAccessTokenAction(suitAccessToken,weworkChatConfig.CorpId, weworkChatConfig.PermanentCode),
+		req)
+	t.Log(err)
+	t.Log(req)
+
+}
+
+

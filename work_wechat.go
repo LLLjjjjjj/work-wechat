@@ -77,19 +77,18 @@ func NewWorkWechat(config Config) *workWechat {
 // 返回原包数据  直接进行链式炒作
 func (w workWechat) Do(ctx context.Context, weWorkAction Action) ([]byte, error) {
 	//todo  context包超时 释放原则
-	return weWorkAction.DoRequest()
+	return weWorkAction.DoRequest(ctx)
 }
 
 //scan 方法 绑定到指定的结构体
 func (w workWechat) Scan(ctx context.Context, weWorkAction Action, pointer interface{}) error {
-	//todo  context包超时 释放原则
-	requestRes , err := weWorkAction.DoRequest()
+	requestRes , err := weWorkAction.DoRequest(ctx)
 	if err != nil{
 		return err
 	}
-
-	err = json.Unmarshal(requestRes, &pointer)
 	fmt.Println(string(requestRes))
+	err = json.Unmarshal(requestRes, &pointer)
+
 
 	if err != nil{
 		return err
