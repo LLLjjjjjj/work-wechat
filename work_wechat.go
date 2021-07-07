@@ -3,6 +3,7 @@ package work
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 )
 
 type Options func(w *workWechat) *workWechat
@@ -85,7 +86,9 @@ func (w workWechat) Scan(ctx context.Context, weWorkAction Action, pointer inter
 	if err != nil{
 		return err
 	}
+	fmt.Println(string(requestRes))
 	err = json.Unmarshal(requestRes, &pointer)
+
 
 	if err != nil{
 		return err
