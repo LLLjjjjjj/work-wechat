@@ -44,14 +44,14 @@ type CryptError struct {
 	ErrMsg  string
 }
 
-func NewCryptError(err_code int, err_msg string) *CryptError {
-	return &CryptError{ErrCode: err_code, ErrMsg: err_msg}
+func NewCryptError(errCode int, errMsg string) *CryptError {
+	return &CryptError{ErrCode: errCode, ErrMsg: errMsg}
 }
 
 type WXBizMsg4Recv struct {
-	Tousername string `xml:"ToUserName"`
+	ToUserName string `xml:"ToUserName"`
 	Encrypt    string `xml:"Encrypt"`
-	Agentid    string `xml:"AgentID"`
+	AgentId    string `xml:"AgentID"`
 }
 
 type CDATA struct {
@@ -71,49 +71,49 @@ func NewWXBizMsg4Send(encrypt, signature, timestamp, nonce string) *WXBizMsg4Sen
 }
 
 type ProtocolProcessor interface {
-	parse(src_data []byte) (*WXBizMsg4Recv, *CryptError)
-	serialize(msg_send *WXBizMsg4Send) ([]byte, *CryptError)
+	parse(srcData []byte) (*WXBizMsg4Recv, *CryptError)
+	serialize(msgSend *WXBizMsg4Send) ([]byte, *CryptError)
 }
 
 type WXBizMsgCrypt struct {
-	token              string
-	encoding_aeskey    string
-	receiver_id        string
-	protocol_processor ProtocolProcessor
+	token             string
+	encodingAeskey    string
+	receiverId        string
+	protocolProcessor ProtocolProcessor
 }
 
 type XmlProcessor struct {
 }
 
-func (self *XmlProcessor) parse(src_data []byte) (*WXBizMsg4Recv, *CryptError) {
-	var msg4_recv WXBizMsg4Recv
-	err := xml.Unmarshal(src_data, &msg4_recv)
+func (p *XmlProcessor) parse(srcData []byte) (*WXBizMsg4Recv, *CryptError) {
+	var msg4Recv WXBizMsg4Recv
+	err := xml.Unmarshal(srcData, &msg4Recv)
 	if nil != err {
 		return nil, NewCryptError(ParseXmlError, "xml to msg fail")
 	}
-	return &msg4_recv, nil
+	return &msg4Recv, nil
 }
 
-func (self *XmlProcessor) serialize(msg4_send *WXBizMsg4Send) ([]byte, *CryptError) {
-	xml_msg, err := xml.Marshal(msg4_send)
+func (p *XmlProcessor) serialize(msg4Send *WXBizMsg4Send) ([]byte, *CryptError) {
+	xmlMsg, err := xml.Marshal(msg4Send)
 	if nil != err {
 		return nil, NewCryptError(GenXmlError, err.Error())
 	}
-	return xml_msg, nil
+	return xmlMsg, nil
 }
 
-func NewWXBizMsgCrypt(token, encoding_aeskey, receiver_id string, protocol_type ProtocolType) *WXBizMsgCrypt {
-	var protocol_processor ProtocolProcessor
-	if protocol_type != XmlType {
+func NewWXBizMsgCrypt(token, encodingAeskey, receiverId string, protocolType ProtocolType) *WXBizMsgCrypt {
+	var protocolProcessor ProtocolProcessor
+	if protocolType != XmlType {
 		panic("unsupport protocal")
 	} else {
-		protocol_processor = new(XmlProcessor)
+		protocolProcessor = new(XmlProcessor)
 	}
 
-	return &WXBizMsgCrypt{token: token, encoding_aeskey: (encoding_aeskey + "="), receiver_id: receiver_id, protocol_processor: protocol_processor}
+	return &WXBizMsgCrypt{token: token, encodingAeskey: encodingAeskey + "=", receiverId: receiverId, protocolProcessor: protocolProcessor}
 }
 
-func (self *WXBizMsgCrypt) randString(n int) string {
+func (c *WXBizMsgCrypt) randString(n int) string {
 	b := make([]byte, n)
 	for i := range b {
 		b[i] = letterBytes[rand.Int63()%int64(len(letterBytes))]
@@ -121,8 +121,8 @@ func (self *WXBizMsgCrypt) randString(n int) string {
 	return string(b)
 }
 
-func (self *WXBizMsgCrypt) pKCS7Padding(plaintext string, block_size int) []byte {
-	padding := block_size - (len(plaintext) % block_size)
+func (c *WXBizMsgCrypt) pKCS7Padding(plaintext string, blockSize int) []byte {
+	padding := blockSize - (len(plaintext) % blockSize)
 	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
 	var buffer bytes.Buffer
 	buffer.WriteString(plaintext)
@@ -130,50 +130,50 @@ func (self *WXBizMsgCrypt) pKCS7Padding(plaintext string, block_size int) []byte
 	return buffer.Bytes()
 }
 
-func (self *WXBizMsgCrypt) pKCS7Unpadding(plaintext []byte, block_size int) ([]byte, *CryptError) {
-	plaintext_len := len(plaintext)
-	if nil == plaintext || plaintext_len == 0 {
+func (c *WXBizMsgCrypt) pKCS7Unpadding(plaintext []byte, blockSize int) ([]byte, *CryptError) {
+	plaintextLen := len(plaintext)
+	if nil == plaintext || plaintextLen == 0 {
 		return nil, NewCryptError(DecryptAESError, "pKCS7Unpadding error nil or zero")
 	}
-	if plaintext_len%block_size != 0 {
+	if plaintextLen%blockSize != 0 {
 		return nil, NewCryptError(DecryptAESError, "pKCS7Unpadding text not a multiple of the block size")
 	}
-	padding_len := int(plaintext[plaintext_len-1])
-	return plaintext[:plaintext_len-padding_len], nil
+	paddingLen := int(plaintext[plaintextLen-1])
+	return plaintext[:plaintextLen-paddingLen], nil
 }
 
-func (self *WXBizMsgCrypt) cbcEncrypter(plaintext string) ([]byte, *CryptError) {
-	aeskey, err := base64.StdEncoding.DecodeString(self.encoding_aeskey)
+func (c *WXBizMsgCrypt) cbcEncrypter(plaintext string) ([]byte, *CryptError) {
+	aeskey, err := base64.StdEncoding.DecodeString(c.encodingAeskey)
 	if nil != err {
 		return nil, NewCryptError(DecodeBase64Error, err.Error())
 	}
-	const block_size = 32
-	pad_msg := self.pKCS7Padding(plaintext, block_size)
+	const blockSize = 32
+	padMsg := c.pKCS7Padding(plaintext, blockSize)
 
 	block, err := aes.NewCipher(aeskey)
 	if err != nil {
 		return nil, NewCryptError(EncryptAESError, err.Error())
 	}
 
-	ciphertext := make([]byte, len(pad_msg))
+	ciphertext := make([]byte, len(padMsg))
 	iv := aeskey[:aes.BlockSize]
 
 	mode := cipher.NewCBCEncrypter(block, iv)
 
-	mode.CryptBlocks(ciphertext, pad_msg)
-	base64_msg := make([]byte, base64.StdEncoding.EncodedLen(len(ciphertext)))
-	base64.StdEncoding.Encode(base64_msg, ciphertext)
+	mode.CryptBlocks(ciphertext, padMsg)
+	base64Msg := make([]byte, base64.StdEncoding.EncodedLen(len(ciphertext)))
+	base64.StdEncoding.Encode(base64Msg, ciphertext)
 
-	return base64_msg, nil
+	return base64Msg, nil
 }
 
-func (self *WXBizMsgCrypt) cbcDecrypter(base64_encrypt_msg string) ([]byte, *CryptError) {
-	aeskey, err := base64.StdEncoding.DecodeString(self.encoding_aeskey)
+func (c *WXBizMsgCrypt) cbcDecrypter(base64EncryptMsg string) ([]byte, *CryptError) {
+	aeskey, err := base64.StdEncoding.DecodeString(c.encodingAeskey)
 	if nil != err {
 		return nil, NewCryptError(DecodeBase64Error, err.Error())
 	}
 
-	encrypt_msg, err := base64.StdEncoding.DecodeString(base64_encrypt_msg)
+	encryptMsg, err := base64.StdEncoding.DecodeString(base64EncryptMsg)
 	if nil != err {
 		return nil, NewCryptError(DecodeBase64Error, err.Error())
 	}
@@ -183,131 +183,131 @@ func (self *WXBizMsgCrypt) cbcDecrypter(base64_encrypt_msg string) ([]byte, *Cry
 		return nil, NewCryptError(DecryptAESError, err.Error())
 	}
 
-	if len(encrypt_msg) < aes.BlockSize {
+	if len(encryptMsg) < aes.BlockSize {
 		return nil, NewCryptError(DecryptAESError, "encrypt_msg size is not valid")
 	}
 
 	iv := aeskey[:aes.BlockSize]
 
-	if len(encrypt_msg)%aes.BlockSize != 0 {
+	if len(encryptMsg)%aes.BlockSize != 0 {
 		return nil, NewCryptError(DecryptAESError, "encrypt_msg not a multiple of the block size")
 	}
 
 	mode := cipher.NewCBCDecrypter(block, iv)
 
-	mode.CryptBlocks(encrypt_msg, encrypt_msg)
+	mode.CryptBlocks(encryptMsg, encryptMsg)
 
-	return encrypt_msg, nil
+	return encryptMsg, nil
 }
 
-func (self *WXBizMsgCrypt) calSignature(timestamp, nonce, data string) string {
-	sort_arr := []string{self.token, timestamp, nonce, data}
-	sort.Strings(sort_arr)
+func (c *WXBizMsgCrypt) calSignature(timestamp, nonce, data string) string {
+	sortArr := []string{c.token, timestamp, nonce, data}
+	sort.Strings(sortArr)
 	var buffer bytes.Buffer
-	for _, value := range sort_arr {
+	for _, value := range sortArr {
 		buffer.WriteString(value)
 	}
 
 	sha := sha1.New()
 	sha.Write(buffer.Bytes())
 	signature := fmt.Sprintf("%x", sha.Sum(nil))
-	return string(signature)
+	return signature
 }
 
-func (self *WXBizMsgCrypt) ParsePlainText(plaintext []byte) ([]byte, uint32, []byte, []byte, *CryptError) {
-	const block_size = 32
-	plaintext, err := self.pKCS7Unpadding(plaintext, block_size)
+func (c *WXBizMsgCrypt) ParsePlainText(plaintext []byte) ([]byte, uint32, []byte, []byte, *CryptError) {
+	const blockSize = 32
+	plaintext, err := c.pKCS7Unpadding(plaintext, blockSize)
 	if nil != err {
 		return nil, 0, nil, nil, err
 	}
 
-	text_len := uint32(len(plaintext))
-	if text_len < 20 {
+	textLen := uint32(len(plaintext))
+	if textLen < 20 {
 		return nil, 0, nil, nil, NewCryptError(IllegalBuffer, "plain is to small 1")
 	}
 	random := plaintext[:16]
-	msg_len := binary.BigEndian.Uint32(plaintext[16:20])
-	if text_len < (20 + msg_len) {
+	msgLen := binary.BigEndian.Uint32(plaintext[16:20])
+	if textLen < (20 + msgLen) {
 		return nil, 0, nil, nil, NewCryptError(IllegalBuffer, "plain is to small 2")
 	}
 
-	msg := plaintext[20 : 20+msg_len]
-	receiver_id := plaintext[20+msg_len:]
+	msg := plaintext[20 : 20+msgLen]
+	receiverId := plaintext[20+msgLen:]
 
-	return random, msg_len, msg, receiver_id, nil
+	return random, msgLen, msg, receiverId, nil
 }
 
-func (self *WXBizMsgCrypt) VerifyURL(msg_signature, timestamp, nonce, echostr string) ([]byte, *CryptError) {
-	signature := self.calSignature(timestamp, nonce, echostr)
+func (c *WXBizMsgCrypt) VerifyURL(msgSignature, timestamp, nonce, echostr string) ([]byte, *CryptError) {
+	signature := c.calSignature(timestamp, nonce, echostr)
 
-	if strings.Compare(signature, msg_signature) != 0 {
+	if strings.Compare(signature, msgSignature) != 0 {
 		return nil, NewCryptError(ValidateSignatureError, "signature not equal")
 	}
 
-	plaintext, err := self.cbcDecrypter(echostr)
+	plaintext, err := c.cbcDecrypter(echostr)
 	if nil != err {
 		return nil, err
 	}
 
-	_, _, msg, receiver_id, err := self.ParsePlainText(plaintext)
+	_, _, msg, receiverId, err := c.ParsePlainText(plaintext)
 	if nil != err {
 		return nil, err
 	}
 
-	if len(self.receiver_id) > 0 && strings.Compare(string(receiver_id), self.receiver_id) != 0 {
-		fmt.Println(string(receiver_id), self.receiver_id, len(receiver_id), len(self.receiver_id))
+	if len(c.receiverId) > 0 && strings.Compare(string(receiverId), c.receiverId) != 0 {
+		fmt.Println(string(receiverId), c.receiverId, len(receiverId), len(c.receiverId))
 		return nil, NewCryptError(ValidateCorpidError, "receiver_id is not equil")
 	}
 
 	return msg, nil
 }
 
-func (self *WXBizMsgCrypt) EncryptMsg(reply_msg, timestamp, nonce string) ([]byte, *CryptError) {
-	rand_str := self.randString(16)
+func (c *WXBizMsgCrypt) EncryptMsg(replyMsg, timestamp, nonce string) ([]byte, *CryptError) {
+	randStr := c.randString(16)
 	var buffer bytes.Buffer
-	buffer.WriteString(rand_str)
+	buffer.WriteString(randStr)
 
-	msg_len_buf := make([]byte, 4)
-	binary.BigEndian.PutUint32(msg_len_buf, uint32(len(reply_msg)))
-	buffer.Write(msg_len_buf)
-	buffer.WriteString(reply_msg)
-	buffer.WriteString(self.receiver_id)
+	msgLenBuf := make([]byte, 4)
+	binary.BigEndian.PutUint32(msgLenBuf, uint32(len(replyMsg)))
+	buffer.Write(msgLenBuf)
+	buffer.WriteString(replyMsg)
+	buffer.WriteString(c.receiverId)
 
-	tmp_ciphertext, err := self.cbcEncrypter(buffer.String())
+	tmpCiphertext, err := c.cbcEncrypter(buffer.String())
 	if nil != err {
 		return nil, err
 	}
-	ciphertext := string(tmp_ciphertext)
+	ciphertext := string(tmpCiphertext)
 
-	signature := self.calSignature(timestamp, nonce, ciphertext)
+	signature := c.calSignature(timestamp, nonce, ciphertext)
 
-	msg4_send := NewWXBizMsg4Send(ciphertext, signature, timestamp, nonce)
-	return self.protocol_processor.serialize(msg4_send)
+	msg4Send := NewWXBizMsg4Send(ciphertext, signature, timestamp, nonce)
+	return c.protocolProcessor.serialize(msg4Send)
 }
 
-func (self *WXBizMsgCrypt) DecryptMsg(msg_signature, timestamp, nonce string, post_data []byte) ([]byte, *CryptError) {
-	msg4_recv, crypt_err := self.protocol_processor.parse(post_data)
-	if nil != crypt_err {
-		return nil, crypt_err
+func (c *WXBizMsgCrypt) DecryptMsg(msgSignature, timestamp, nonce string, postData []byte) ([]byte, *CryptError) {
+	msg4Recv, cryptErr := c.protocolProcessor.parse(postData)
+	if nil != cryptErr {
+		return nil, cryptErr
 	}
 
-	signature := self.calSignature(timestamp, nonce, msg4_recv.Encrypt)
+	signature := c.calSignature(timestamp, nonce, msg4Recv.Encrypt)
 
-	if strings.Compare(signature, msg_signature) != 0 {
+	if strings.Compare(signature, msgSignature) != 0 {
 		return nil, NewCryptError(ValidateSignatureError, "signature not equal")
 	}
 
-	plaintext, crypt_err := self.cbcDecrypter(msg4_recv.Encrypt)
-	if nil != crypt_err {
-		return nil, crypt_err
+	plaintext, cryptErr := c.cbcDecrypter(msg4Recv.Encrypt)
+	if nil != cryptErr {
+		return nil, cryptErr
 	}
 
-	_, _, msg, receiver_id, crypt_err := self.ParsePlainText(plaintext)
-	if nil != crypt_err {
-		return nil, crypt_err
+	_, _, msg, receiverId, cryptErr := c.ParsePlainText(plaintext)
+	if nil != cryptErr {
+		return nil, cryptErr
 	}
 
-	if len(self.receiver_id) > 0 && strings.Compare(string(receiver_id), self.receiver_id) != 0 {
+	if len(c.receiverId) > 0 && strings.Compare(string(receiverId), c.receiverId) != 0 {
 		return nil, NewCryptError(ValidateCorpidError, "receiver_id is not equil")
 	}
 

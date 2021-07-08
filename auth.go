@@ -3,6 +3,7 @@ package work
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 )
 
@@ -101,8 +102,8 @@ func NewGetPermanentCode(suitAccessToken string, authCode string) Action {
  * @return *respGetPreAuthCode
  * @return error
  */
-func (w workWechat)  GetPreAuthCode(suitAccessToken string) (*respGetPreAuthCode , error){
-	opt := &respGetPreAuthCode{}
+func (w workWechat)  GetPreAuthCode(suitAccessToken string) (*RespGetPreAuthCode , error){
+	opt := &RespGetPreAuthCode{}
 	err := w.Scan(context.Background(),NewGetPreAuthCode(suitAccessToken),opt)
 	if err != nil{
 		return nil, err
