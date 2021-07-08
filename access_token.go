@@ -38,18 +38,18 @@ func (a *accessToken) getProviderAccessToken() string {
 	return a.cache.Get(context.Background(), ProviderAccessTokenRedisKey+a.workWechat.ProviderCorpID).Val()
 }
 
-// getSuitAccessToken 获取应用access_token
-func (a *accessToken) getSuitAccessToken() string {
+// GetSuitAccessToken 获取应用access_token
+func (a *accessToken) GetSuitAccessToken() string {
 	return a.cache.Get(context.Background(), SuitAccessTokenRedisKey+a.workWechat.SuiteID).Val()
 }
 
-// getSuiteTicket 获取应用ticket
-func (a *accessToken) getSuiteTicket() string {
+// GetSuiteTicket 获取应用ticket
+func (a *accessToken) GetSuiteTicket() string {
 	return a.cache.Get(context.Background(), SuitTicketRedisKey+a.workWechat.SuiteID).Val()
 }
 
-// getCorpAccessToken 获取企业access_token
-func (a *accessToken) getCorpAccessToken() string {
+// GetCorpAccessToken 获取企业access_token
+func (a *accessToken) GetCorpAccessToken() string {
 	return a.cache.Get(context.Background(), CorpAccessTokenRedisKey+a.workWechat.CorpId).Val()
 }
 
