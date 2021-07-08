@@ -30,19 +30,14 @@ func TestNewWorkWechat(t *testing.T) {
 	classInfo := NewWorkWechat(testConfig)
 	// TODO 获取 suitAccessToken
 	suitAccessToken := "suitAccessToken"
-	// 获取 企业预先授权码
-	opt := &RespGetPreAuthCode{}
-	err := classInfo.Scan(context.Background(), NewGetPreAuthCode(suitAccessToken), opt)
-	fmt.Println(opt)
-	t.Log(err)
-	// 获取 企业的永久授权码
-	authCode := "1111"
-	req :=  reqGetPermanentCode{
-		AuthCode: authCode,
+	res , err := classInfo.GetPreAuthCode(suitAccessToken)
+	if err != nil{
+		t.Log(err)
 	}
-	err = classInfo.Scan(context.Background(), NewGetPermanentCode(suitAccessToken, authCode),req )
-	t.Log(err)
-
+	if res == nil{
+		t.Log(res)
+		return
+	}
 }
 
 func TestGetProviderAccessTokenAction(t *testing.T) {
@@ -57,12 +52,11 @@ func TestGetProviderAccessTokenAction(t *testing.T) {
 		PermanentCode:  "",
 	}
 	classInfo := NewWorkWechat(testConfig)
-	var respGetProviderToken = RespGetProviderToken{}
-	err := classInfo.Scan(context.Background(),
-		GetProviderAccessTokenAction(testConfig.ProviderCorpID,testConfig.ProviderSecret),
-		respGetProviderToken,
-	)
-	fmt.Println(err)
+	res , err := classInfo.GetProviderAccessToken()
+	if err != nil{
+		return
+	}
+	fmt.Println(res)
 }
 
 func TestGetSuitAccessTokenAction(t *testing.T) {

@@ -1,6 +1,7 @@
 package work
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 )
@@ -91,3 +92,25 @@ func NewGetPermanentCode(suitAccessToken string, authCode string) Action {
 		}),
 	)
 }
+
+/**
+ * @Description: 获取预授权码
+ * @author:21
+ * @receiver w
+ * @param suitAccessToken
+ * @return *respGetPreAuthCode
+ * @return error
+ */
+func (w workWechat)  GetPreAuthCode(suitAccessToken string) (*respGetPreAuthCode , error){
+	opt := &respGetPreAuthCode{}
+	err := w.Scan(context.Background(),NewGetPreAuthCode(suitAccessToken),opt)
+	if err != nil{
+		return nil, err
+	}
+	if opt.ErrCode != 0 {
+		return nil, errors.New("获取预授权码失败")
+	}
+	return opt, nil
+}
+
+

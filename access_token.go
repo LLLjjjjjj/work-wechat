@@ -3,6 +3,7 @@ package work
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/arden/easy"
 	"github.com/arden/easy/database/redis"
@@ -178,6 +179,38 @@ func GetCorpAccessTokenAction(suitAccessToken string, corpId string, permanentCo
 			return jsonInfo, nil
 		}),
 	)
+}
+
+/**
+ * @Description:
+ * @author:21
+ * @receiver w
+ * @return *reqGetSuiteToken
+ * @return error
+ */
+func (w workWechat) GetProviderAccessToken() (*RespGetProviderToken, error)  {
+	if len(w.ProviderCorpID) < 1 {
+		return nil, errors.New("设置ProviderCorpID出错")
+	}
+
+	if len(w.ProviderSecret) < 1{
+		return nil, errors.New("设置ProviderSecret出错")
+	}
+
+	var resp = &RespGetProviderToken{}
+	err := w.Scan(context.Background(),
+		GetProviderAccessTokenAction(w.ProviderCorpID,w.ProviderSecret),
+		resp,
+	)
+
+	if err != nil{
+		return nil, err
+	}
+
+	if resp.respCommon.ErrCode != 0  {
+		return nil, errors.New("获取响应数据失败")
+	}
+	return resp, nil
 }
 
 
