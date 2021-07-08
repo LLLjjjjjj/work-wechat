@@ -31,7 +31,7 @@ func TestNewWorkWechat(t *testing.T) {
 	// TODO 获取 suitAccessToken
 	suitAccessToken := "suitAccessToken"
 	// 获取 企业预先授权码
-	opt := &respGetPreAuthCode{}
+	opt := &RespGetPreAuthCode{}
 	err := classInfo.Scan(context.Background(), NewGetPreAuthCode(suitAccessToken), opt)
 	fmt.Println(opt)
 	t.Log(err)
@@ -57,7 +57,7 @@ func TestGetProviderAccessTokenAction(t *testing.T) {
 		PermanentCode:  "",
 	}
 	classInfo := NewWorkWechat(testConfig)
-	var respGetProviderToken = respGetProviderToken{}
+	var respGetProviderToken = RespGetProviderToken{}
 	err := classInfo.Scan(context.Background(),
 		GetProviderAccessTokenAction(testConfig.ProviderCorpID,testConfig.ProviderSecret),
 		respGetProviderToken,

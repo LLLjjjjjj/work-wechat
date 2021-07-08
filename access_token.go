@@ -3,11 +3,9 @@ package work
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/arden/easy"
 	"github.com/arden/easy/database/redis"
-	"github.com/gogf/gf/util/gconv"
 )
 
 // 服务商token 后面拼接服务商id
@@ -54,78 +52,78 @@ func (a *accessToken) getCorpAccessToken() string {
 	return a.cache.Get(context.Background(), CorpAccessTokenRedisKey+a.workWechat.CorpId).Val()
 }
 
-func (a *accessToken) providerAccessToken() (respGetProviderToken, error) {
-	var req = reqGetProviderToken{
-		CorpId:         a.workWechat.ProviderCorpID,
-		ProviderSecret: a.workWechat.ProviderSecret,
-	}
-	var respGetProviderToken = respGetProviderToken{}
-
-	resp, err := HttpClient.httpPost("/cgi-bin/service/get_provider_token", req)
-	if err != nil {
-		return respGetProviderToken, err
-	}
-
-	if resp == "" {
-		return respGetProviderToken, errors.New("请求错误")
-	}
-
-	err = gconv.Struct(resp, respGetProviderToken)
-	if err != nil {
-		return respGetProviderToken, err
-	}
-
-	return respGetProviderToken, nil
-}
-
-func (a *accessToken) suitAccessToken() (reqGetSuiteToken, error) {
-	var req = reqGetSuiteToken{
-		SuiteID:     a.workWechat.SuiteID,
-		SuitSecret:  a.workWechat.SuiteSecret,
-		SuiteTicket: a.workWechat.SuiteTicket,
-	}
-	var reqGetSuiteToken = reqGetSuiteToken{}
-
-	resp, err := HttpClient.httpPost("/cgi-bin/service/get_suite_token", req)
-	if err != nil {
-		return reqGetSuiteToken, err
-	}
-
-	if resp == "" {
-		return reqGetSuiteToken, errors.New("请求错误")
-	}
-
-	err = gconv.Struct(resp, reqGetSuiteToken)
-	if err != nil {
-		return reqGetSuiteToken, err
-	}
-
-	return reqGetSuiteToken, nil
-}
-
-func (a *accessToken) corpAccessToken() (reqGetCorpToken, error) {
-	var req = reqGetCorpToken{
-		AuthCorpID:    a.workWechat.CorpId,
-		PermanentCode: a.workWechat.PermanentCode,
-	}
-	var reqGetCorpToken = reqGetCorpToken{}
-
-	resp, err := HttpClient.httpPost("/cgi-bin/service/get_suite_token?suite_access_token="+a.getSuitAccessToken(), req)
-	if err != nil {
-		return reqGetCorpToken, err
-	}
-
-	if resp == "" {
-		return reqGetCorpToken, errors.New("请求错误")
-	}
-
-	err = gconv.Struct(resp, reqGetCorpToken)
-	if err != nil {
-		return reqGetCorpToken, err
-	}
-
-	return reqGetCorpToken, nil
-}
+//func (a *accessToken) providerAccessToken() (respGetProviderToken, error) {
+//	var req = reqGetProviderToken{
+//		CorpId:         a.workWechat.ProviderCorpID,
+//		ProviderSecret: a.workWechat.ProviderSecret,
+//	}
+//	var respGetProviderToken = respGetProviderToken{}
+//
+//	resp, err := HttpClient.httpPost("/cgi-bin/service/get_provider_token", req)
+//	if err != nil {
+//		return respGetProviderToken, err
+//	}
+//
+//	if resp == "" {
+//		return respGetProviderToken, errors.New("请求错误")
+//	}
+//
+//	err = gconv.Struct(resp, respGetProviderToken)
+//	if err != nil {
+//		return respGetProviderToken, err
+//	}
+//
+//	return respGetProviderToken, nil
+//}
+//
+//func (a *accessToken) suitAccessToken() (reqGetSuiteToken, error) {
+//	var req = reqGetSuiteToken{
+//		SuiteID:     a.workWechat.SuiteID,
+//		SuitSecret:  a.workWechat.SuiteSecret,
+//		SuiteTicket: a.workWechat.SuiteTicket,
+//	}
+//	var reqGetSuiteToken = reqGetSuiteToken{}
+//
+//	resp, err := HttpClient.httpPost("/cgi-bin/service/get_suite_token", req)
+//	if err != nil {
+//		return reqGetSuiteToken, err
+//	}
+//
+//	if resp == "" {
+//		return reqGetSuiteToken, errors.New("请求错误")
+//	}
+//
+//	err = gconv.Struct(resp, reqGetSuiteToken)
+//	if err != nil {
+//		return reqGetSuiteToken, err
+//	}
+//
+//	return reqGetSuiteToken, nil
+//}
+//
+//func (a *accessToken) corpAccessToken() (reqGetCorpToken, error) {
+//	var req = reqGetCorpToken{
+//		AuthCorpID:    a.workWechat.CorpId,
+//		PermanentCode: a.workWechat.PermanentCode,
+//	}
+//	var reqGetCorpToken = reqGetCorpToken{}
+//
+//	resp, err := HttpClient.httpPost("/cgi-bin/service/get_suite_token?suite_access_token="+a.getSuitAccessToken(), req)
+//	if err != nil {
+//		return reqGetCorpToken, err
+//	}
+//
+//	if resp == "" {
+//		return reqGetCorpToken, errors.New("请求错误")
+//	}
+//
+//	err = gconv.Struct(resp, reqGetCorpToken)
+//	if err != nil {
+//		return reqGetCorpToken, err
+//	}
+//
+//	return reqGetCorpToken, nil
+//}
 
 func GetProviderAccessTokenAction(providerCorpId string, providerSecret string) Action {
 	reqUrl := BaseWeWorkUrl + "/cgi-bin/service/get_provider_token"

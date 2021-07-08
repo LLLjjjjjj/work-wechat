@@ -30,8 +30,8 @@ func (x reqGetProviderToken) intoBody() ([]byte, error) {
 	return result, nil
 }
 
-// respGetProviderToken 获取服务商凭证校验
-type respGetProviderToken struct {
+// RespGetProviderToken 获取服务商凭证校验
+type RespGetProviderToken struct {
 	respCommon
 	ProviderToken
 }
@@ -63,8 +63,8 @@ func (x reqGetSuiteToken) intoBody() ([]byte, error) {
 	return result, nil
 }
 
-// respGetSuiteToken 获取第三方应用凭证校验
-type respGetSuiteToken struct {
+// RespGetSuiteToken 获取第三方应用凭证校验
+type RespGetSuiteToken struct {
 	respCommon
 	SuiteToken
 }
@@ -95,8 +95,8 @@ func (x reqGetCorpToken) intoBody() ([]byte, error) {
 	return result, nil
 }
 
-// respGetSuiteToken 获取企业凭证校验
-type respGetCorpToken struct {
+// RespGetSuiteToken 获取企业凭证校验
+type RespGetCorpToken struct {
 	respCommon
 	CorpToken
 }
@@ -123,8 +123,8 @@ func (x reqGetPreAuthCode) intoURLValues() url.Values {
 	}
 }
 
-// respGetPreAuthCode 获取预授权码校验
-type respGetPreAuthCode struct {
+// RespGetPreAuthCode 获取预授权码校验
+type RespGetPreAuthCode struct {
 	respCommon
 	PreAuthCode
 }
@@ -154,8 +154,8 @@ func (x reqGetPermanentCode) intoBody() ([]byte, error) {
 	return result, nil
 }
 
-// respGetPermanentCode 永久授权码校验
-type respGetPermanentCode struct {
+// RespGetPermanentCode 永久授权码校验
+type RespGetPermanentCode struct {
 	respCommon
 	PermanentCode
 }
