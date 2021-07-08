@@ -13,7 +13,7 @@ import (
 const ProviderAccessTokenRedisKey = "hdcj:provider_access_token:"
 
 // 第三方应用token 后面拼接应用id
-const SuitAccessTokenRedisKey = "hdcj:provider_access_token:"
+const SuitAccessTokenRedisKey = "hdcj:suit_access_token:"
 
 // 第三方应用ticket 后面拼接应用id
 const SuitTicketRedisKey = "hdcj:suit_ticket:"
