@@ -186,7 +186,7 @@ func (a *accessToken) GetSuiteAccessToken() (*RespGetSuiteToken, error) {
 
 	var resp = &RespGetSuiteToken{}
 	err := a.workWechat.Scan(context.Background(),
-		GetSuitAccessTokenAction(a.workWechat.SuiteID, a.workWechat.SuiteSecret, a.GetSuiteAccessTokenByCache()),
+		GetSuitAccessTokenAction(a.workWechat.SuiteID, a.workWechat.SuiteSecret, a.GetSuiteTicketByCache()),
 		resp,
 	)
 
