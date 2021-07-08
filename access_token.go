@@ -19,7 +19,7 @@ const SuitAccessTokenRedisKey = "hdcj:suit_access_token:"
 const SuitTicketRedisKey = "hdcj:suit_ticket:"
 
 // 授权的企业token 后面拼接企业id
-const CorpAccessTokenRedisKey = "hdcj:provider_access_token:"
+const CorpAccessTokenRedisKey = "hdcj:corp_access_token:"
 
 type accessToken struct {
 	workWechat workWechat
