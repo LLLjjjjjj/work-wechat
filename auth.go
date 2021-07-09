@@ -95,11 +95,11 @@ func (a *auth) SetSessionInfo(preAuthCode string, info SessionInfo) (*RespSetSes
  * @return *RespGetPreAuthCode
  * @return error
  */
-func (a *auth) GetPermanentCode(authCode string) (*RespGetPreAuthCode, error) {
+func (a *auth) GetPermanentCode(authCode string) (*RespGetPermanentCode, error) {
 
 	suiteAccessToken := a.workWechat.NewAccessToken().GetSuiteAccessTokenByCache()
 
-	opt := &RespGetPreAuthCode{}
+	opt := &RespGetPermanentCode{}
 	err := a.workWechat.Scan(context.Background(), NewGetPermanentCode(suiteAccessToken, authCode), opt)
 	if err != nil {
 		return nil, err
