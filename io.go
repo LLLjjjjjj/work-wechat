@@ -171,3 +171,34 @@ type PermanentCode struct {
 	DealerCorpInfo   DealerCorpInfo   `json:"dealer_corp_info"`
 	RegisterCodeInfo RegisterCodeInfo `json:"register_code_info"`
 }
+
+
+/**
+设置授权配置
+*/
+// reqSetSessionInfo 获取永久授权码校验
+type reqSetSessionInfo struct {
+	PreAuthCode string `json:"pre_auth_code"`
+	SessionInfo SessionInfo `json:"session_info"`
+}
+
+type SessionInfo struct {
+	AppId []string `json:"appid"`
+	AuthType int `json:"auth_type"`
+}
+
+var _ bodyer = reqSetSessionInfo{}
+
+func (x reqSetSessionInfo) intoBody() ([]byte, error) {
+	result, err := json.Marshal(x)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// RespGetPermanentCode 设置授权配置
+type RespSetSessionInfo struct {
+	respCommon
+}
