@@ -27,7 +27,7 @@ func TestGetExternalContactList(t *testing.T) {
 	userId := "11111"
 	var resp = &ExternalContactList{}
 	err := classInfo.Scan(context.Background(),
-		GetExternalContactList(accessToken,userId),
+		NewGetExternalContactList(accessToken,userId),
 		resp,
 	)
 	t.Log(err)
@@ -51,7 +51,7 @@ func TestGetExternalContactUserInfo(t *testing.T) {
 	cursors := "11111"
 	var resp = &ExternalContactUserInfo{}
 	err := classInfo.Scan(context.Background(),
-		GetExternalContactUserInfo(accessToken,userId, cursors),
+		NewGetExternalContactUserInfo(accessToken,userId, cursors),
 		resp,
 	)
 	t.Log(err)

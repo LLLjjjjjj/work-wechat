@@ -13,12 +13,12 @@ type externalContactListDetails struct {
 // 外部联系人用户信息
 type ExternalContactUserInfo struct {
 	respCommon
-	ExternalContact externalContact `json:"external_contact"`
+	ExternalContact externalContactStruct `json:"external_contact"`
 	FollowUser []*followUser `json:"follow_user"`
 	NextCursor string `json:"next_cursor"`
 }
 
-type externalContact struct {
+type externalContactStruct struct {
 	ExternalUserid string `json:"external_userid"`
 	Name string `json:"name"`
 	Position string `json:"position"`
@@ -64,4 +64,44 @@ type followUser struct {
 	OperUserid string `json:"oper_userid"`
 	AddWay int `json:"add_way"`
 	State string `json:"state,omitempty"`
+}
+
+// 发送欢迎语
+type reqSendWelcomeMsg struct {
+	WelcomeCode string `json:"welcome_code"`
+	Text Text `json:"text"`
+	Attachments []Attachments `json:"attachments"`
+}
+type Text struct {
+	Content string `json:"content"`
+}
+type Image struct {
+	MediaID string `json:"media_id"`
+	PicURL string `json:"pic_url"`
+}
+type Link struct {
+	Title string `json:"title"`
+	Picurl string `json:"picurl"`
+	Desc string `json:"desc"`
+	URL string `json:"url"`
+}
+type Miniprogram struct {
+	Title string `json:"title"`
+	PicMediaID string `json:"pic_media_id"`
+	Appid string `json:"appid"`
+	Page string `json:"page"`
+}
+type Video struct {
+	MediaID string `json:"media_id"`
+}
+type Attachments struct {
+	Msgtype string `json:"msgtype"`
+	Image Image `json:"image,omitempty"`
+	Link Link `json:"link,omitempty"`
+	Miniprogram Miniprogram `json:"miniprogram,omitempty"`
+	Video Video `json:"video,omitempty"`
+}
+
+type RespSendWelcomeMsg struct {
+	respCommon
 }
