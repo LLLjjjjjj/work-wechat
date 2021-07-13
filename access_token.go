@@ -119,7 +119,7 @@ func GetSuitAccessTokenAction(suiteId string, suiteSecret string, suiteTicket st
 }
 
 func GetCorpAccessTokenAction(suitAccessToken string, corpId string, permanentCode string) Action {
-	reqUrl := BaseWeWorkUrl + fmt.Sprintf("/cgi-bin/service/get_suite_token?suite_access_token=%s", suitAccessToken)
+	reqUrl := BaseWeWorkUrl + fmt.Sprintf("/cgi-bin/service/get_corp_token?suite_access_token=%s", suitAccessToken)
 	return NewWeWordApi(reqUrl,
 		WitchMethod(HttpPost),
 		WitchBody(func() (bytes []byte, e error) {

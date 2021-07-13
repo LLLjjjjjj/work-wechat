@@ -26,4 +26,7 @@ type Action interface {
 
 	// 获取超时时间
 	GetTimeOut() time.Duration
+
+	// 获取头部
+	GetHeader() map[string]string
 }

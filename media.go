@@ -19,20 +19,11 @@ func (w workWechat) NewMedia() *media {
 }
 
 // 上传临时素材
-func NewTemporaryUpload(accessToken string, fileType string) Action {
+func NewTemporaryUpload(accessToken string, filePath, fileType string) Action {
 	reqUrl := BaseWeWorkUrl + fmt.Sprintf("/cgi-bin/media/upload?access_token=%s&type=%s", accessToken, fileType)
 	return NewWeWordApi(reqUrl,
-		WitchMethod(HttpPost),
-		WitchBody(func() (bytes []byte, e error) {
-			reqInfo := reqTemporaryUpload{
-
-			}
-			jsonInfo, err := json.Marshal(reqInfo)
-			if err != nil {
-				return nil, err
-			}
-			return jsonInfo, nil
-		}),
+		WitchMethod(HttpUpload),
+		WitchUploadForm(fmt.Sprintf("upload-file=@file:%v", filePath)),
 	)
 }
 
@@ -45,13 +36,14 @@ func NewTemporaryUpload(accessToken string, fileType string) Action {
  * @return *RespTemporaryUpload
  * @return error
  */
-func (m *media) TemporaryUpload(fileSteam, fileType string) (*RespTemporaryUpload, error) {
+func (m *media) TemporaryUpload(filePath, fileType string) (*RespTemporaryUpload, error) {
 
 	cropAccessToken := m.workWechat.NewAccessToken().GetCorpAccessTokenByCache()
 
 	opt := &RespTemporaryUpload{}
 	err := m.workWechat.Scan(context.Background(), NewTemporaryUpload(
 		cropAccessToken,
+		filePath,
 		fileType,
 	), opt)
 	if err != nil {
@@ -65,20 +57,11 @@ func (m *media) TemporaryUpload(fileSteam, fileType string) (*RespTemporaryUploa
 
 
 // 上传图片素材
-func NewImgUpload(accessToken string) Action {
+func NewImgUpload(accessToken string, filePath string) Action {
 	reqUrl := BaseWeWorkUrl + fmt.Sprintf("/cgi-bin/media/uploadimg?access_token=%s", accessToken)
 	return NewWeWordApi(reqUrl,
-		WitchMethod(HttpPost),
-		WitchBody(func() (bytes []byte, e error) {
-			reqInfo := reqImgUpload{
-
-			}
-			jsonInfo, err := json.Marshal(reqInfo)
-			if err != nil {
-				return nil, err
-			}
-			return jsonInfo, nil
-		}),
+		WitchMethod(HttpUpload),
+		WitchUploadForm(fmt.Sprintf("upload-file=@file:%v", filePath)),
 	)
 }
 
@@ -90,13 +73,14 @@ func NewImgUpload(accessToken string) Action {
  * @return *RespImgUpload
  * @return error
  */
-func (m *media) ImgUpload(fileSteam string) (*RespImgUpload, error) {
+func (m *media) ImgUpload(filePath string) (*RespImgUpload, error) {
 
 	cropAccessToken := m.workWechat.NewAccessToken().GetCorpAccessTokenByCache()
 
 	opt := &RespImgUpload{}
 	err := m.workWechat.Scan(context.Background(), NewImgUpload(
 		cropAccessToken,
+		filePath,
 	), opt)
 	if err != nil {
 		return nil, err
@@ -112,16 +96,6 @@ func NewMediaGet(accessToken string, mediaId string) Action {
 	reqUrl := BaseWeWorkUrl + fmt.Sprintf("/cgi-bin/media/get?access_token=%s&media_id=%s", accessToken, mediaId)
 	return NewWeWordApi(reqUrl,
 		WitchMethod(HttpGet),
-		WitchBody(func() (bytes []byte, e error) {
-			reqInfo := reqImgUpload{
-
-			}
-			jsonInfo, err := json.Marshal(reqInfo)
-			if err != nil {
-				return nil, err
-			}
-			return jsonInfo, nil
-		}),
 	)
 }
 
@@ -135,19 +109,22 @@ func NewMediaGet(accessToken string, mediaId string) Action {
  * @return error
  */
 func (m *media) MediaGet(mediaId string) (*RespMediaGet, error) {
-
 	cropAccessToken := m.workWechat.NewAccessToken().GetCorpAccessTokenByCache()
-
-	opt := &RespMediaGet{}
-	err := m.workWechat.Scan(context.Background(), NewMediaGet(
-		cropAccessToken,
-		mediaId,
-	), opt)
+	res, err := m.workWechat.Do(context.Background(), NewMediaGet(cropAccessToken,mediaId))
 	if err != nil {
 		return nil, err
 	}
-	if opt.ErrCode != 0 {
-		return nil, errors.New("获取素材失败")
+
+	opt := &RespMediaGet{}
+	err = json.Unmarshal(res, opt)
+	if err == nil { // 无素材
+		return opt, nil
 	}
+
+	// 有素材二进制文件
+	opt.ErrCode = 0
+	opt.FileStream = res
+
 	return opt, nil
 }
+

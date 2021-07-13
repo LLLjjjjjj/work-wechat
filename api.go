@@ -19,6 +19,7 @@ type HTTPOption func(s *httpSettings)
 const (
 	HttpGet  = "GET"
 	HttpPost = "POST"
+	HttpUpload = "UPLOAD"
 )
 
 // httpSettings http request options
@@ -35,10 +36,11 @@ type HTTPMethod string
 type weWorkApi struct {
 	reqURL string
 	method HTTPMethod
+	header map[string]string
 	//query      url.Values
 	//wxml       func(appid, mchid, nonce string) (WXML, error)
 	body func() ([]byte, error)
-	//uploadForm UploadForm
+	uploadForm  string
 	//decode     func(resp []byte) error
 	timeout time.Duration
 }
@@ -59,6 +61,14 @@ func (w weWorkApi) GetTimeOut() time.Duration {
 	return w.timeout
 }
 
+func (w weWorkApi) GetUploadForm() string {
+	return w.uploadForm
+}
+
+func (w weWorkApi) GetHeader() map[string]string {
+	return w.header
+}
+
 func (w weWorkApi) DoRequest(ctx context.Context) ([]byte, error) {
 	requestUrl := w.GetRequestUrl()
 	if len(requestUrl) < 1 {
@@ -77,6 +87,12 @@ func (w weWorkApi) DoRequest(ctx context.Context) ([]byte, error) {
 	timeOut := w.GetTimeOut()
 	httpClient.SetTimeout(timeOut)
 
+	// 如果有存在请求头则设置进去
+	headers := w.GetHeader()
+	if headers != nil {
+		httpClient.Header(headers)
+	}
+
 	switch method {
 	case HttpGet:
 		r, err := httpClient.Get(requestUrl)
@@ -84,12 +100,21 @@ func (w weWorkApi) DoRequest(ctx context.Context) ([]byte, error) {
 			return nil, err
 		}
 		defer r.Close()
+
 		return r.ReadAll(), nil
 	case HttpPost:
 		body, err := w.GetRequestBody()
 		if err != nil {
 			return nil, err
 		}
+		r, err := httpClient.Post(requestUrl, body)
+		if err != nil {
+			return nil, err
+		}
+		defer r.Close()
+		return r.ReadAll(), nil
+	case HttpUpload:
+		body := w.GetUploadForm()
 		r, err := httpClient.Post(requestUrl, body)
 		if err != nil {
 			return nil, err
@@ -112,6 +137,20 @@ func WitchMethod(method HTTPMethod) ActionOption {
 func WitchTimeOut(timeOut time.Duration) ActionOption {
 	return func(w *weWorkApi) {
 		w.timeout = timeOut
+	}
+}
+
+// 设置请求体
+func WitchHeader(header map[string]string) ActionOption {
+	return func(w *weWorkApi) {
+		w.header = header
+	}
+}
+
+// 设置请求体
+func WitchUploadForm(buffer string) ActionOption {
+	return func(w *weWorkApi) {
+		w.uploadForm = buffer
 	}
 }
 

@@ -96,3 +96,19 @@ func (w workWechat) Scan(ctx context.Context, weWorkAction Action, pointer inter
 	return nil
 }
 
+//Uploader 方法 上传专用
+func (w workWechat) Uploader(ctx context.Context, weWorkAction Action, pointer interface{}) error {
+	requestRes , err := weWorkAction.DoRequest(ctx)
+	if err != nil{
+		return err
+	}
+	fmt.Println(string(requestRes))
+	err = json.Unmarshal(requestRes, &pointer)
+
+
+	if err != nil{
+		return err
+	}
+	return nil
+}
+

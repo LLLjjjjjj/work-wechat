@@ -28,16 +28,17 @@ func TestNewWorkWechat(t *testing.T) {
 		PermanentCode:  "",
 	}
 	classInfo := NewWorkWechat(testConfig)
+	fmt.Println(classInfo)
 	// TODO 获取 suitAccessToken
-	suitAccessToken := "suitAccessToken"
-	res , err := classInfo.GetPreAuthCode(suitAccessToken)
-	if err != nil{
-		t.Log(err)
-	}
-	if res == nil{
-		t.Log(res)
-		return
-	}
+	//suitAccessToken := "suitAccessToken"
+	//res , err := classInfo.GetPreAuthCode(suitAccessToken)
+	//if err != nil{
+	//	t.Log(err)
+	//}
+	//if res == nil{
+	//	t.Log(res)
+	//	return
+	//}
 }
 
 func TestGetProviderAccessTokenAction(t *testing.T) {
@@ -52,7 +53,7 @@ func TestGetProviderAccessTokenAction(t *testing.T) {
 		PermanentCode:  "",
 	}
 	classInfo := NewWorkWechat(testConfig)
-	res , err := classInfo.GetProviderAccessToken()
+	res , err := classInfo.NewAccessToken().GetProviderAccessToken()
 	if err != nil{
 		return
 	}
