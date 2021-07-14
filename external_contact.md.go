@@ -105,3 +105,9 @@ type Attachments struct {
 type RespSendWelcomeMsg struct {
 	respCommon
 }
+
+
+type RespGetFollowUserList struct {
+	respCommon
+	FollowUser []string `json:"follow_user"`
+}

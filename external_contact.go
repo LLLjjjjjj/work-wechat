@@ -132,3 +132,35 @@ func (e *externalContact) SendWelcomeMsg(welcomeCode string, text string, attach
 	}
 	return opt, nil
 }
+
+// 获取配置了客户联系功能的成员列表
+func NewGetFollowUserList(corpAccessToken string) Action {
+	reqUrl := BaseWeWorkUrl + fmt.Sprintf("/cgi-bin/externalcontact/get_follow_user_list?access_token=%s", corpAccessToken)
+	return NewWeWordApi(reqUrl,
+		WitchMethod(HttpGet),
+	)
+}
+
+/**
+ * @Description: 获取配置了客户联系功能的成员列表
+ * @author:ljj
+ * @receiver w
+ * @return *RespGetFollowUserList
+ * @return error
+ */
+func (e *externalContact) GetFollowUserList() (*RespGetFollowUserList, error) {
+
+	cropAccessToken := e.workWechat.NewAccessToken().GetCorpAccessTokenByCache()
+
+	opt := &RespGetFollowUserList{}
+	err := e.workWechat.Scan(context.Background(), NewGetFollowUserList(
+		cropAccessToken,
+	), opt)
+	if err != nil {
+		return nil, err
+	}
+	if opt.ErrCode != 0 {
+		return nil, errors.New("获取配置了客户联系功能的成员列表失败")
+	}
+	return opt, nil
+}

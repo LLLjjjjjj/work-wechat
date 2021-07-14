@@ -26,7 +26,7 @@ func TestGetUserInfoAction(t *testing.T) {
 	classInfo := NewWorkWechat(testConfig)
 	var resp = &UserInfo{}
 	err := classInfo.Scan(context.Background(),
-		GetUserInfoAction(accessToken, userId),
+		NewGetUserInfoAction(accessToken, userId),
 		resp,
 	)
 	t.Log(err)
