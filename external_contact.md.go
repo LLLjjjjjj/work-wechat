@@ -111,3 +111,44 @@ type RespGetFollowUserList struct {
 	respCommon
 	FollowUser []string `json:"follow_user"`
 }
+
+type AddContactWayResp struct {
+	respCommon
+	ConfigID string `json:"config_id"`
+	QrCode string `json:"qr_code"`
+}
+
+type AddContactWayReq struct {
+	Type int `json:"type"`
+	Scene int `json:"scene"`
+	Style int `json:"style"`
+	Remark string `json:"remark"`
+	SkipVerify bool `json:"skip_verify"`
+	State string `json:"state"`
+	User []string `json:"user"`
+	Party []int `json:"party"`
+	IsTemp bool `json:"is_temp"`
+	ExpiresIn int `json:"expires_in"`
+	ChatExpiresIn int `json:"chat_expires_in"`
+	Unionid string `json:"unionid"`
+	Conclusions struct {
+		Text struct {
+			Content string `json:"content"`
+		} `json:"text"`
+		Image struct {
+			MediaID string `json:"media_id"`
+		} `json:"image"`
+		Link struct {
+			Title string `json:"title"`
+			Picurl string `json:"picurl"`
+			Desc string `json:"desc"`
+			URL string `json:"url"`
+		} `json:"link"`
+		Miniprogram struct {
+			Title string `json:"title"`
+			PicMediaID string `json:"pic_media_id"`
+			Appid string `json:"appid"`
+			Page string `json:"page"`
+		} `json:"miniprogram"`
+	} `json:"conclusions"`
+}

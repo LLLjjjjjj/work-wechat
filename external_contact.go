@@ -164,3 +164,46 @@ func (e *externalContact) GetFollowUserList() (*RespGetFollowUserList, error) {
 	}
 	return opt, nil
 }
+
+// 添加配置客户联系「联系我」方式
+func NewAddContactWay(corpAccessToken string, userId []string, remark string, state string) Action {
+	reqUrl := BaseWeWorkUrl + fmt.Sprintf("/cgi-bin/externalcontact/add_contact_way?access_token=%s", corpAccessToken)
+	return NewWeWordApi(reqUrl,
+		WitchMethod(HttpPost),
+		WitchBody(func() (bytes []byte, e error) {
+			reqInfo := AddContactWayReq{
+				Type:          1,
+				Scene:         2,
+				Remark:        remark,
+				SkipVerify:    true,
+				State:         state,
+				User:          userId,
+			}
+			jsonInfo, err := json.Marshal(reqInfo)
+			if err != nil {
+				return nil, err
+			}
+			return jsonInfo, nil
+		}),
+	)
+}
+
+// 添加配置客户联系「联系我」方式
+func (e *externalContact) AddContactWay(userId []string, remark string, state string) (*AddContactWayResp, error) {
+	cropAccessToken := e.workWechat.NewAccessToken().GetCorpAccessTokenByCache()
+
+	opt := &AddContactWayResp{}
+	err := e.workWechat.Scan(context.Background(), NewAddContactWay(
+		cropAccessToken,
+		userId,
+		remark,
+		state,
+	), opt)
+	if err != nil {
+		return nil, err
+	}
+	if opt.ErrCode != 0 {
+		return nil, errors.New("配置客户联系「联系我」方式失败")
+	}
+	return opt, nil
+}
