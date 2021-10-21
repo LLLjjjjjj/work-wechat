@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 )
 
 // 外部联系人相关
@@ -128,7 +129,7 @@ func (e *externalContact) SendWelcomeMsg(welcomeCode string, text string, attach
 		return nil, err
 	}
 	if opt.ErrCode != 0 {
-		return nil, errors.New("设置授权配置失败")
+		return nil, errors.New("错误信息：" + opt.ErrMsg + "错误码：" + strconv.FormatInt(opt.ErrCode, 10))
 	}
 	return opt, nil
 }
