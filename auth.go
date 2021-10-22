@@ -82,7 +82,7 @@ func (a *auth) SetSessionInfo(preAuthCode string, info SessionInfo) (*RespSetSes
 		return nil, err
 	}
 	if opt.ErrCode != 0 {
-		return nil, errors.New("设置授权配置失败")
+		return nil, errors.New("设置授权配置失败" + opt.ErrMsg)
 	}
 	return opt, nil
 }
@@ -105,7 +105,7 @@ func (a *auth) GetPermanentCode(authCode string) (*RespGetPermanentCode, error) 
 		return nil, err
 	}
 	if opt.ErrCode != 0 {
-		return nil, errors.New("获取永久授权码失败")
+		return nil, errors.New("获取永久授权码失败" + opt.ErrMsg)
 	}
 	return opt, nil
 }
@@ -127,7 +127,7 @@ func (a *auth) GetPreAuthCode() (*RespGetPreAuthCode, error) {
 		return nil, err
 	}
 	if opt.ErrCode != 0 {
-		return nil, errors.New("获取预授权码失败")
+		return nil, errors.New("获取预授权码失败" + opt.ErrMsg)
 	}
 	return opt, nil
 }

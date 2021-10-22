@@ -50,7 +50,7 @@ func (m *media) TemporaryUpload(filePath, fileType string) (*RespTemporaryUpload
 		return nil, err
 	}
 	if opt.ErrCode != 0 {
-		return nil, errors.New("上传临时素材失败")
+		return nil, errors.New("上传临时素材失败" + opt.ErrMsg)
 	}
 	return opt, nil
 }
@@ -66,7 +66,7 @@ func NewImgUpload(accessToken string, filePath string) Action {
 }
 
 /**
- * @Description: 上传临时素材
+ * @Description: 上传图片素材
  * @author:ljj
  * @receiver w
  * @param fileSteam string 二进制流
@@ -86,7 +86,7 @@ func (m *media) ImgUpload(filePath string) (*RespImgUpload, error) {
 		return nil, err
 	}
 	if opt.ErrCode != 0 {
-		return nil, errors.New("上传图片失败")
+		return nil, errors.New("上传图片失败" + opt.ErrMsg)
 	}
 	return opt, nil
 }

@@ -137,7 +137,7 @@ func GetCorpAccessTokenAction(suitAccessToken string, corpId string, permanentCo
 }
 
 /**
- * @Description:
+ * @Description:获取服务商应用access_token
  * @author:21
  * @receiver w
  * @return *RespGetProviderToken
@@ -163,7 +163,7 @@ func (a *accessToken) GetProviderAccessToken() (*RespGetProviderToken, error) {
 	}
 
 	if resp.respCommon.ErrCode != 0 {
-		return nil, errors.New("获取响应数据失败")
+		return nil, errors.New("获取服务商应用token失败" + resp.respCommon.ErrMsg)
 	}
 	return resp, nil
 }
@@ -195,7 +195,7 @@ func (a *accessToken) GetSuiteAccessToken() (*RespGetSuiteToken, error) {
 	}
 
 	if resp.respCommon.ErrCode != 0 {
-		return nil, errors.New("获取响应数据失败")
+		return nil, errors.New("获取第三方应用token失败" + resp.respCommon.ErrMsg)
 	}
 	return resp, nil
 }
@@ -228,7 +228,7 @@ func (a *accessToken) GetCorpAccessToken() (*RespGetCorpToken, error) {
 	}
 
 	if resp.respCommon.ErrCode != 0 {
-		return nil, errors.New("获取响应数据失败")
+		return nil, errors.New("获取授权企业应用token失败" + resp.respCommon.ErrMsg)
 	}
 	return resp, nil
 }

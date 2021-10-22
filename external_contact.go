@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strconv"
 )
 
 // 外部联系人相关
@@ -45,7 +44,7 @@ func (e *externalContact) GetExternalContactList(userId string) (*ExternalContac
 		return nil, err
 	}
 	if opt.ErrCode != 0 {
-		return nil, errors.New("设置授权配置失败")
+		return nil, errors.New("获取客户列表失败" + opt.ErrMsg)
 	}
 	return opt, nil
 }
@@ -77,7 +76,7 @@ func (e *externalContact) GetExternalContactUserInfo(externalUserId string, curs
 		return nil, err
 	}
 	if opt.ErrCode != 0 {
-		return nil, errors.New("设置授权配置失败")
+		return nil, errors.New("获取客户详细信息失败" + opt.ErrMsg)
 	}
 	return opt, nil
 }
@@ -129,7 +128,7 @@ func (e *externalContact) SendWelcomeMsg(welcomeCode string, text string, attach
 		return nil, err
 	}
 	if opt.ErrCode != 0 {
-		return nil, errors.New("错误信息：" + opt.ErrMsg + "错误码：" + strconv.FormatInt(opt.ErrCode, 10))
+		return nil, errors.New("发送新客户欢迎语失败" + opt.ErrMsg)
 	}
 	return opt, nil
 }
@@ -161,7 +160,7 @@ func (e *externalContact) GetFollowUserList() (*RespGetFollowUserList, error) {
 		return nil, err
 	}
 	if opt.ErrCode != 0 {
-		return nil, errors.New("获取配置了客户联系功能的成员列表失败")
+		return nil, errors.New("获取配置了客户联系功能的成员列表失败" + opt.ErrMsg)
 	}
 	return opt, nil
 }
@@ -204,7 +203,7 @@ func (e *externalContact) AddContactWay(userId []string, remark string, state st
 		return nil, err
 	}
 	if opt.ErrCode != 0 {
-		return nil, errors.New("配置客户联系「联系我」方式失败")
+		return nil, errors.New("配置客户联系「联系我」方式失败" + opt.ErrMsg)
 	}
 	return opt, nil
 }

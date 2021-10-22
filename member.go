@@ -40,7 +40,7 @@ func (m *member) GetUserInfoAction(userId string) (*UserInfo, error) {
 		return nil, err
 	}
 	if opt.ErrCode != 0 {
-		return nil, errors.New("设置授权配置失败")
+		return nil, errors.New("获取成员信息失败" + opt.ErrMsg)
 	}
 	return opt, nil
 }
