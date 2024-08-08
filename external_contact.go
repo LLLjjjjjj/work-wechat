@@ -172,12 +172,12 @@ func NewAddContactWay(corpAccessToken string, userId []string, remark string, st
 		WitchMethod(HttpPost),
 		WitchBody(func() (bytes []byte, e error) {
 			reqInfo := AddContactWayReq{
-				Type:          1,
-				Scene:         2,
-				Remark:        remark,
-				SkipVerify:    true,
-				State:         state,
-				User:          userId,
+				Type:       1,
+				Scene:      2,
+				Remark:     remark,
+				SkipVerify: true,
+				State:      state,
+				User:       userId,
 			}
 			jsonInfo, err := json.Marshal(reqInfo)
 			if err != nil {
