@@ -1,6 +1,6 @@
 package work
 
-// 外部联系人列表
+// 外部联系人列表 17
 type ExternalContactList struct {
 	respCommon
 	externalContactListDetails
