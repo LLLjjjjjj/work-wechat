@@ -202,6 +202,7 @@ func (e *externalContact) AddContactWay(userId []string, remark string, state st
 	if err != nil {
 		return nil, err
 	}
+	//111
 	if opt.ErrCode != 0 {
 		return nil, errors.New("配置客户联系「联系我」方式失败" + opt.ErrMsg)
 	}
