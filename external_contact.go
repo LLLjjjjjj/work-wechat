@@ -202,9 +202,197 @@ func (e *externalContact) AddContactWay(userId []string, remark string, state st
 	if err != nil {
 		return nil, err
 	}
-	//111
 	if opt.ErrCode != 0 {
 		return nil, errors.New("配置客户联系「联系我」方式失败" + opt.ErrMsg)
+	}
+	return opt, nil
+}
+
+func NewOpenGidToChatId(corpAccessToken, openGid string) Action {
+	reqUrl := BaseWeWorkUrl + fmt.Sprintf("/cgi-bin/externalcontact/opengid_to_chatid?access_token=%s", corpAccessToken)
+	return NewWeWordApi(reqUrl,
+		WitchMethod(HttpPost),
+		WitchBody(func() (bytes []byte, e error) {
+			reqInfo := &OpenGidToChatIdReq{
+				OpenGid: openGid,
+			}
+			jsonInfo, err := json.Marshal(reqInfo)
+			if err != nil {
+				return nil, err
+			}
+			return jsonInfo, nil
+		}),
+	)
+}
+
+// 客户群opengid转换ChatId
+func (e *externalContact) GetOpenGidToChatId(openGid string) (*OpenGidToChatIdResp, error) {
+	cropAccessToken := e.workWechat.NewAccessToken().GetCorpAccessTokenByCache()
+	opt := &OpenGidToChatIdResp{}
+	err := e.workWechat.Scan(context.Background(), NewOpenGidToChatId(
+		cropAccessToken,
+		openGid,
+	), opt)
+	if err != nil || opt == nil {
+		return nil, err
+	}
+	if opt.ErrCode != 0 {
+		return nil, errors.New("客户群opengid转换ChatId" + opt.ErrMsg)
+	}
+	return opt, nil
+}
+
+func NewAddGroupWelcomeTemplate(corpAccessToken string, req *AddGroupWelcomeTemplateReq) Action {
+	reqUrl := BaseWeWorkUrl + fmt.Sprintf("/cgi-bin/externalcontact/group_welcome_template/add?access_token=%s", corpAccessToken)
+	return NewWeWordApi(reqUrl,
+		WitchMethod(HttpPost),
+		WitchBody(func() (bytes []byte, e error) {
+			jsonInfo, err := json.Marshal(req)
+			if err != nil {
+				return nil, err
+			}
+			return jsonInfo, nil
+		}),
+	)
+}
+
+// 添加入群欢迎语素材
+func (e *externalContact) AddGroupWelcomeTemplate(req *AddGroupWelcomeTemplateReq) (*AddGroupWelcomeTemplateResp, error) {
+	cropAccessToken := e.workWechat.NewAccessToken().GetCorpAccessTokenByCache()
+	opt := &AddGroupWelcomeTemplateResp{}
+	err := e.workWechat.Scan(context.Background(), NewAddGroupWelcomeTemplate(
+		cropAccessToken,
+		req,
+	), opt)
+	if err != nil || opt == nil {
+		return nil, err
+	}
+	if opt.ErrCode != 0 {
+		return nil, errors.New("添加入群欢迎语素材" + opt.ErrMsg)
+	}
+	return opt, nil
+}
+
+func NewEditGroupWelcomeTemplate(corpAccessToken string, req *EditGroupWelcomeTemplateReq) Action {
+	reqUrl := BaseWeWorkUrl + fmt.Sprintf("/cgi-bin/externalcontact/group_welcome_template/edit?access_token=%s", corpAccessToken)
+	return NewWeWordApi(reqUrl,
+		WitchMethod(HttpPost),
+		WitchBody(func() (bytes []byte, e error) {
+			jsonInfo, err := json.Marshal(req)
+			if err != nil {
+				return nil, err
+			}
+			return jsonInfo, nil
+		}),
+	)
+}
+
+// 编辑入群欢迎语素材
+func (e *externalContact) EditGroupWelcomeTemplate(req *EditGroupWelcomeTemplateReq) (*EditGroupWelcomeTemplateResp, error) {
+	cropAccessToken := e.workWechat.NewAccessToken().GetCorpAccessTokenByCache()
+	opt := &EditGroupWelcomeTemplateResp{}
+	err := e.workWechat.Scan(context.Background(), NewEditGroupWelcomeTemplate(
+		cropAccessToken,
+		req,
+	), opt)
+	if err != nil || opt == nil {
+		return nil, err
+	}
+	if opt.ErrCode != 0 {
+		return nil, errors.New("编辑入群欢迎语素材" + opt.ErrMsg)
+	}
+	return opt, nil
+}
+
+func NewGetGroupWelcomeTemplate(corpAccessToken string, templateId string) Action {
+	reqUrl := BaseWeWorkUrl + fmt.Sprintf("/cgi-bin/externalcontact/group_welcome_template/get?access_token=%s", corpAccessToken)
+	return NewWeWordApi(reqUrl,
+		WitchMethod(HttpPost),
+		WitchBody(func() (bytes []byte, e error) {
+			req := &GetGroupWelcomeTemplateReq{TemplateId: templateId}
+			jsonInfo, err := json.Marshal(req)
+			if err != nil {
+				return nil, err
+			}
+			return jsonInfo, nil
+		}),
+	)
+}
+
+// 获取入群欢迎语素材
+func (e *externalContact) GetGroupWelcomeTemplate(templateId string) (*GetGroupWelcomeTemplateResp, error) {
+	cropAccessToken := e.workWechat.NewAccessToken().GetCorpAccessTokenByCache()
+	opt := &GetGroupWelcomeTemplateResp{}
+	err := e.workWechat.Scan(context.Background(), NewGetGroupWelcomeTemplate(
+		cropAccessToken,
+		templateId,
+	), opt)
+	if err != nil {
+		return nil, err
+	}
+	if opt == nil || opt.ErrCode != 0 {
+		return nil, errors.New("获取入群欢迎语素材" + opt.ErrMsg)
+	}
+	return opt, nil
+}
+
+func NewDelGroupWelcomeTemplate(corpAccessToken string, templateId string, agentId int) Action {
+	reqUrl := BaseWeWorkUrl + fmt.Sprintf("/cgi-bin/externalcontact/group_welcome_template/del?access_token=%s", corpAccessToken)
+	return NewWeWordApi(reqUrl,
+		WitchMethod(HttpPost),
+		WitchBody(func() (bytes []byte, e error) {
+			req := &DeleteGroupWelcomeTemplateReq{TemplateId: templateId, AgentId: agentId}
+			jsonInfo, err := json.Marshal(req)
+			if err != nil {
+				return nil, err
+			}
+			return jsonInfo, nil
+		}),
+	)
+}
+
+// 删除入群欢迎语素材
+func (e *externalContact) DelGroupWelcomeTemplate(templateId string, agentId int) (*DeleteGroupWelcomeTemplateResp, error) {
+	cropAccessToken := e.workWechat.NewAccessToken().GetCorpAccessTokenByCache()
+	opt := &DeleteGroupWelcomeTemplateResp{}
+	err := e.workWechat.Scan(context.Background(), NewDelGroupWelcomeTemplate(
+		cropAccessToken,
+		templateId,
+		agentId,
+	), opt)
+	if err != nil || opt == nil {
+		return nil, err
+	}
+	if opt.ErrCode != 0 {
+		return nil, errors.New("删除入群欢迎语素材" + opt.ErrMsg)
+	}
+	return opt, nil
+}
+
+func NewUnionidToExternalUserid3rd(suiteAccessToken string, req *GetUnionidToExternalUserid3rdReq) Action {
+	reqUrl := BaseWeWorkUrl + fmt.Sprintf("/cgi-bin/service/externalcontact/unionid_to_external_userid_3rd?suite_access_token=%s", suiteAccessToken)
+	return NewWeWordApi(reqUrl,
+		WitchMethod(HttpPost),
+		WitchBody(func() (bytes []byte, e error) {
+			jsonInfo, err := json.Marshal(req)
+			if err != nil {
+				return nil, err
+			}
+			return jsonInfo, nil
+		}),
+	)
+}
+
+// 第三方主体unionid转换为第三方external_userid
+func (e *externalContact) GetUnionidToExternalUserid3rd(req *GetUnionidToExternalUserid3rdReq) (*GetUnionidToExternalUserid3rdResp, error) {
+	suiteAccessToken := e.workWechat.NewAccessToken().GetSuiteAccessTokenByCache()
+	opt := &GetUnionidToExternalUserid3rdResp{}
+	err := e.workWechat.Scan(context.Background(), NewUnionidToExternalUserid3rd(suiteAccessToken, req), opt)
+	if err != nil || opt == nil {
+		return nil, err
+	}
+	if opt.ErrCode != 0 {
+		return nil, errors.New("第三方主体unionid转换为第三方external_userid" + opt.ErrMsg)
 	}
 	return opt, nil
 }

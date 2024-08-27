@@ -225,6 +225,22 @@ type EditGroupWelcomeTemplateReq struct {
 	AgentID     int                              `json:"agentid"`
 }
 
+type GetUnionidToExternalUserid3rdReq struct {
+	Unionid string `json:"unionid"`
+	Openid  string `json:"openid"`
+	Corpid  string `json:"corpid,omitempty"`
+}
+
+type ExternalUserInfo struct {
+	CorpID         string `json:"corpid"`
+	ExternalUserID string `json:"external_userid"`
+}
+
+type GetUnionidToExternalUserid3rdResp struct {
+	respCommon
+	ExternalUserIDInfo []*ExternalUserInfo `json:"external_userid_info"`
+}
+
 type EditGroupWelcomeTemplateResp struct {
 	respCommon
 }
